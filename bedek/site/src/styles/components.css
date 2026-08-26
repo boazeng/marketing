@@ -1,0 +1,799 @@
+/* Components and sections. Every colour comes from a token in tokens.css --
+   there is no literal hex in this file, so re-running the palette script
+   re-skins the whole site. */
+
+/* ------------------------------------------------------------------ logo */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+.logo-group {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  line-height: 1;
+}
+.logo-group i {
+  font-style: normal;
+  color: var(--accent);
+}
+.logo-word {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 12px 22px;
+  font-weight: 700;
+  font-size: var(--t-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn--full {
+  width: 100%;
+}
+.btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn--primary:hover {
+  background: var(--accentDeep);
+}
+.btn--primary:disabled {
+  background: var(--inkFaint);
+  cursor: progress;
+}
+.btn--ghost {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--brand);
+}
+.btn--ghost:hover {
+  border-color: var(--brand);
+  background: var(--brandSoft);
+}
+.btn--quiet {
+  background: transparent;
+  color: var(--brand);
+  padding-inline: 4px;
+}
+/* on the brand-filled band the ghost button needs its own treatment */
+.section--brand .btn--ghost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #fff;
+}
+.section--brand .btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #fff;
+}
+
+/* ------------------------------------------------------------------- bar */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--canvas) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.bar--lifted {
+  border-bottom-color: var(--border);
+  box-shadow: 0 1px 14px rgb(0 0 0 / 0.04);
+}
+.bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 72px;
+}
+.bar-logo {
+  text-decoration: none;
+  flex: none;
+}
+.bar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-end: auto;
+}
+.bar-nav a {
+  color: var(--inkSoft);
+  text-decoration: none;
+  font-size: var(--t-sm);
+  font-weight: 500;
+  padding: 8px 13px;
+  border-radius: 999px;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+.bar-nav a:hover {
+  color: var(--brandInk);
+  background: var(--brandSoft);
+}
+.bar-nav-app {
+  color: var(--brand) !important;
+}
+.bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+.bar-toggle {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 9px;
+  color: var(--brand);
+  cursor: pointer;
+}
+
+@media (max-width: 860px) {
+  .bar-toggle {
+    display: grid;
+    place-items: center;
+  }
+  .bar-nav {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px clamp(20px, 5vw, 40px) 16px;
+    display: none;
+  }
+  .bar-nav.is-open {
+    display: flex;
+  }
+  .bar-nav a {
+    border-radius: 8px;
+    padding: 11px 12px;
+  }
+}
+@media (max-width: 520px) {
+  .bar-actions .btn {
+    padding-inline: 14px;
+  }
+}
+
+/* ------------------------------------------------------------------ hero */
+
+.hero {
+  padding-block: clamp(44px, 7vw, 88px) clamp(56px, 9vw, 104px);
+  background:
+    radial-gradient(
+      120% 80% at 85% -10%,
+      var(--brandSoft) 0%,
+      transparent 60%
+    ),
+    var(--canvas);
+}
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(28px, 5vw, 56px);
+  align-items: center;
+}
+.hero-copy {
+  gap: 20px;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--t-hero);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.03em;
+  margin: 0;
+  text-wrap: balance;
+}
+.hero-title-2 {
+  color: var(--brand);
+}
+.hero-sub {
+  max-width: 46ch;
+}
+.hero-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* the product, abstracted to the one screen that sells it */
+.hero-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px -22px rgb(0 0 0 / 0.28);
+  overflow: hidden;
+}
+.panel-bar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.panel-title {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--inkSoft);
+}
+.panel-stats {
+  display: flex;
+  gap: clamp(18px, 4vw, 34px);
+  padding: 20px 18px;
+}
+.panel-stat b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--brand);
+}
+.panel-stat span {
+  font-size: 12px;
+  color: var(--inkFaint);
+}
+.panel-stat.is-late b {
+  color: var(--accentDeep);
+}
+.panel-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.panel-rows li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--mist);
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.panel-rows svg {
+  flex: none;
+  color: var(--appCustomer);
+}
+.panel-rows li:nth-child(2) svg {
+  color: var(--accentDeep);
+}
+.panel-loc {
+  color: var(--inkSoft);
+  flex: 1;
+  min-width: 0;
+}
+.panel-who {
+  color: var(--inkFaint);
+  flex: none;
+}
+
+@media (max-width: 900px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----------------------------------------------------------------- cards */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px 22px;
+}
+.card p {
+  font-size: var(--t-sm);
+  color: var(--inkSoft);
+}
+.card--plain {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.card-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--brandSoft);
+  color: var(--brandInk);
+}
+.card-alert {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--accentSoft);
+  color: var(--accentDeep);
+}
+.card-who {
+  color: var(--accentDeep);
+}
+.badge {
+  margin-top: auto;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brandInk);
+  background: var(--brandSoft);
+  border-radius: 999px;
+  padding: 3px 11px;
+}
+
+/* ----------------------------------------------------------------- steps */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(16px, 2.4vw, 24px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  counter-reset: step;
+}
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 11px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 26px 22px 24px;
+}
+.step-num {
+  position: absolute;
+  inset-block-start: 18px;
+  /* RTL: an absolutely positioned box with no `inset-inline-end` snaps to the
+     wrong edge, so it is stated explicitly. */
+  inset-inline-end: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.step-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--brand);
+  color: #fff;
+}
+.step p {
+  font-size: var(--t-sm);
+  color: var(--inkSoft);
+}
+
+/* ------------------------------------------------------------ android note */
+
+.note-android {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  margin-top: clamp(20px, 3vw, 30px);
+  background: var(--accentSoft);
+  border-radius: 12px;
+  padding: 18px 20px;
+  color: var(--accentDeep);
+}
+.note-android svg {
+  flex: none;
+  margin-top: 2px;
+}
+.note-android p {
+  font-size: var(--t-sm);
+  color: var(--inkSoft);
+  margin-bottom: 4px;
+}
+.note-android a {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--accentDeep);
+}
+
+/* ------------------------------------------------------------------- faq */
+
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 820px;
+}
+.faq details {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 17px 20px;
+  cursor: pointer;
+  font-weight: 500;
+  list-style: none;
+}
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary svg {
+  flex: none;
+  color: var(--inkFaint);
+  transition: transform 0.18s ease;
+}
+.faq details[open] summary svg {
+  transform: rotate(-90deg);
+}
+.faq p {
+  padding: 0 20px 18px;
+  font-size: var(--t-sm);
+  color: var(--inkSoft);
+}
+
+/* --------------------------------------------------------------- contact */
+
+.contact-inner {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  gap: clamp(28px, 5vw, 56px);
+  align-items: start;
+}
+.contact-copy {
+  gap: 16px;
+}
+.contact-copy .lead {
+  color: rgb(255 255 255 / 0.82);
+}
+.contact-points {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.contact-points li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: var(--t-sm);
+  color: rgb(255 255 255 / 0.9);
+}
+.contact-points svg {
+  color: var(--accent);
+  flex: none;
+}
+.contact-card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: clamp(22px, 3vw, 30px);
+  color: var(--inkStrong);
+}
+@media (max-width: 900px) {
+  .contact-inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ------------------------------------------------------------------ form */
+
+/* Honeypot: off-screen rather than display:none, which some bots skip. */
+.hp {
+  position: absolute;
+  inset-inline-start: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.lead-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.field--wide {
+  grid-column: 1 / -1;
+}
+.field label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--inkSoft);
+}
+.field input,
+.field textarea {
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 13px;
+  font-size: var(--t-sm);
+  resize: vertical;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+.field input:focus,
+.field textarea:focus {
+  background: var(--surface);
+  border-color: var(--brand);
+}
+.field input[aria-invalid="true"] {
+  border-color: var(--accentDeep);
+}
+.field-err {
+  font-size: 12px;
+  color: var(--accentDeep);
+}
+.form-done,
+.form-error {
+  font-size: var(--t-sm);
+}
+.form-done {
+  color: var(--brandInk);
+  background: var(--brandSoft);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.form-error {
+  margin-top: 12px;
+  color: var(--accentDeep);
+}
+.form-error a {
+  color: var(--accentDeep);
+  margin-inline-start: 4px;
+}
+@media (max-width: 520px) {
+  /* Honeypot: off-screen rather than display:none, which some bots skip. */
+.hp {
+  position: absolute;
+  inset-inline-start: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.lead-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.foot {
+  background: var(--brandInk);
+  color: #fff;
+  padding-block: 44px 34px;
+}
+.foot-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.foot-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.foot-tag {
+  font-size: var(--t-sm);
+  color: rgb(255 255 255 / 0.6);
+}
+.foot-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgb(255 255 255 / 0.16);
+}
+.foot-nav a {
+  color: rgb(255 255 255 / 0.82);
+  text-decoration: none;
+  font-size: var(--t-sm);
+}
+.foot-nav a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+.foot-legal {
+  font-size: 12.5px;
+  color: rgb(255 255 255 / 0.5);
+}
+
+/* --------------------------------------------------------------- consent */
+
+.consent {
+  position: fixed;
+  inset-inline: 16px;
+  bottom: 16px;
+  z-index: 60;
+  margin-inline: auto;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 12px 36px -14px rgb(0 0 0 / 0.3);
+  padding: 16px 20px;
+}
+.consent p {
+  flex: 1;
+  min-width: 240px;
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--inkSoft);
+}
+.consent-actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+/* Both buttons keep the same size and weight; only the fill differs. Making
+   "decline" quieter than "accept" is the dark pattern this avoids. */
+.consent-actions .btn {
+  padding: 9px 16px;
+  font-size: 13px;
+}
+@media (max-width: 520px) {
+  .consent-actions {
+    width: 100%;
+  }
+  .consent-actions .btn {
+    flex: 1;
+  }
+}
+
+/* --------------------------------------------------------- landing page */
+
+.lp-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.lp-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 70px;
+}
+.lp-bar-note {
+  font-size: var(--t-sm);
+  color: var(--inkSoft);
+}
+.lp-hero {
+  padding-block: clamp(40px, 6vw, 72px);
+  background:
+    radial-gradient(110% 70% at 88% -8%, var(--brandSoft) 0%, transparent 62%),
+    var(--canvas);
+}
+.lp-hero-inner {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(26px, 4.5vw, 50px);
+  align-items: start;
+}
+.lp-hero-copy {
+  gap: 20px;
+}
+.lp-points,
+.lp-pain ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.lp-points li,
+.lp-pain li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: var(--t-sm);
+  color: var(--inkSoft);
+}
+.lp-points b,
+.lp-pain b {
+  display: block;
+  color: var(--inkStrong);
+  font-weight: 700;
+}
+.lp-point-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--brand);
+  color: #fff;
+}
+.lp-pain {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 26px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.lp-pain svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--accentDeep);
+}
+.lp-app-link {
+  font-size: 13px;
+  color: var(--inkFaint);
+}
+@media (max-width: 880px) {
+  .lp-hero-inner {
+    grid-template-columns: 1fr;
+  }
+}

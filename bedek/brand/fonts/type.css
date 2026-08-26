@@ -1,0 +1,92 @@
+/* TACT Bedek -- typography. Import once, globally, after tokens.css.
+
+   Three faces, three jobs, no overlap:
+     Rubik 800        headings and the wordmark. Chosen over Suez One and
+                      Secular One because it is the only one of the three with
+                      a real weight range, so one family covers a 46px H1 and
+                      an 11px label without falling back to something else.
+     Heebo            body and UI. Same face as TACT and both mobile apps, so
+                      a visitor who installs the app meets the same text.
+     Space Grotesk    numbers and Latin. Already TACT's convention; its
+                      tabular figures are why KPI rows line up.
+
+   Hebrew has no uppercase, so anywhere a Latin design would reach for
+   all-caps we use letter-spacing on Space Grotesk instead. */
+
+@import url("https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&family=Rubik:wght@500;700;800&family=Space+Grotesk:wght@400;500;700&display=swap");
+
+:root {
+  --font-display: Rubik, Heebo, "Segoe UI", system-ui, sans-serif;
+  --font-body: Heebo, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Space Grotesk", ui-monospace, "SF Mono", monospace;
+
+  /* A 1.25 scale from 16px, rounded to whole pixels. Display sizes clamp so
+     the page does not need breakpoints just to keep a headline in bounds. */
+  --t-hero: clamp(2.25rem, 1.4rem + 3.6vw, 4rem); /* 36 -> 64 */
+  --t-h1: clamp(2rem, 1.4rem + 2.4vw, 3rem); /* 32 -> 48 */
+  --t-h2: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); /* 24 -> 32 */
+  --t-h3: 1.25rem; /* 20 */
+  --t-lead: 1.1875rem; /* 19 */
+  --t-body: 1rem; /* 16 */
+  --t-sm: 0.875rem; /* 14 */
+  --t-label: 0.6875rem; /* 11 */
+
+  --lh-tight: 1.1;
+  --lh-snug: 1.35;
+  --lh-body: 1.65;
+
+  --measure: 62ch; /* running text never runs wider than this */
+}
+
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--t-h1);
+}
+h2 {
+  font-size: var(--t-h2);
+}
+h3 {
+  font-size: var(--t-h3);
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+  max-width: var(--measure);
+  line-height: var(--lh-body);
+}
+
+/* The eyebrow: Hebrew cannot be set in caps, so the small-label signal has to
+   come from tracking and size instead. */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* Latin and digits inside Hebrew text. `isolate` keeps bidi from dragging a
+   trailing bracket or period to the wrong end of the run. */
+.ltr,
+.num {
+  font-family: var(--font-mono);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}

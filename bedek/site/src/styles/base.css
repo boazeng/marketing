@@ -1,0 +1,171 @@
+/* Reset, ground, and the handful of layout primitives every section uses.
+
+   The site commits to one light look on purpose -- it is a marketing site,
+   the palette was designed in light, and a half-considered dark mode reads
+   worse than none. Every colour is therefore painted explicitly from a token;
+   nothing inherits from the browser. */
+
+@import "./tokens.css";
+@import "./type.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+  /* the sticky bar must not cover an anchor target */
+  scroll-padding-top: 88px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--inkStrong);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--brand);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: clamp(20px, 5vw, 40px);
+}
+
+/* Sections space themselves with padding; siblings inside them space with
+   gap. No element carries a bare margin, so nothing collapses or doubles. */
+.section {
+  padding-block: clamp(56px, 9vw, 104px);
+}
+
+.section--tint {
+  background: var(--mist);
+}
+
+.section--brand {
+  background: var(--brand);
+  color: #fff;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: clamp(28px, 4vw, 48px);
+}
+
+.eyebrow {
+  align-self: flex-start;
+  display: inline-block;
+  color: var(--brandInk);
+  background: var(--brandSoft);
+  border-radius: 5px;
+  padding: 4px 10px;
+}
+
+.lead {
+  font-size: var(--t-lead);
+  color: var(--inkSoft);
+}
+
+.grid {
+  display: grid;
+  gap: clamp(14px, 2vw, 20px);
+}
+
+.grid--3 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+
+.grid--4 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+/* Any wide thing scrolls inside itself. The body never scrolls sideways. */
+.scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Skip link -- keyboard users should not tab the whole nav on every page. */
+.skip {
+  position: absolute;
+  inset-inline-start: 16px;
+  top: -60px;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--brandInk);
+  border: 1px solid var(--brand);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 500;
+  transition: top 0.15s ease;
+}
+
+.skip:focus {
+  top: 16px;
+}
