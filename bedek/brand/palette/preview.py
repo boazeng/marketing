@@ -6,11 +6,15 @@ Colours are read, never retyped -- the page cannot drift from the spec.
 The page chrome is deliberately achromatic: any hue in the shell would
 contaminate the judgement of the four candidates it exists to compare.
 """
-import io, json, sys
+import io, json, os, sys
 sys.stdout.reconfigure(encoding="utf-8")
+
+# Paths resolve against this file, never the caller's cwd.
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 from oklch import contrast_ratio
 
-D = json.load(io.open("directions.json", encoding="utf-8"))
+D = json.load(io.open(os.path.join(HERE, "directions.json"), encoding="utf-8"))
 
 HERO_EYEBROW = "TACT בדק"
 HERO_H1 = "כל תקופת הבדק.<br>במקום אחד."
@@ -225,5 +229,5 @@ HTML = """<title>ארבעה כיווני צבע לבדק</title>
     jump="".join('<a href="#{}">{}</a>'.format(d["name"], d["title"]) for d in D),
     bands="".join(band(d) for d in D))
 
-io.open("preview.html", "w", encoding="utf-8").write(HTML)
+io.open(os.path.join(HERE, "preview.html"), "w", encoding="utf-8").write(HTML)
 print("preview.html written:", len(HTML), "bytes")

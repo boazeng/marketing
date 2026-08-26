@@ -7,9 +7,13 @@ eyeball becomes a defect that every later direction inherits.
 
     python contrast.py
 """
-import io, json, sys
+import io, json, os, sys
 
-sys.stdout.reconfigure(encoding="utf-8")  # Hebrew dies on cp1252 otherwise
+sys.stdout.reconfigure(encoding="utf-8")
+
+# Paths resolve against this file, never the caller's cwd.
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)  # Hebrew dies on cp1252 otherwise
 from oklch import contrast_ratio
 
 AA_TEXT, AA_LARGE, AA_UI = 4.5, 3.0, 3.0
@@ -59,7 +63,7 @@ def check(directions):
 
 
 if __name__ == "__main__":
-    src = sys.argv[1] if len(sys.argv) > 1 else "directions.json"
+    src = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "directions.json")
     n = check(json.load(io.open(src, encoding="utf-8")))
     if n:
         print(f"\n{n} contrast failures -- fix the spec in palette.py.")

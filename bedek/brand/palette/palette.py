@@ -14,9 +14,14 @@ Anchors we are bridging between:
 
     python palette.py   -> directions.json (all four) + tokens.css (chosen)
 """
-import io, json, sys
+import io, json, os, sys
 
 sys.stdout.reconfigure(encoding="utf-8")  # Hebrew dies on cp1252 otherwise
+
+# Paths resolve against this file, never the caller's cwd -- these are run as
+# `python brand/palette/palette.py` from the brand root.
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 from oklch import oklch
 
 EMERALD_H, INDIGO_H, STEEL_H = 169.0, 285.0, 256.0
@@ -102,10 +107,10 @@ def chosen():
 
 
 if __name__ == "__main__":
-    out = sys.argv[1] if len(sys.argv) > 1 else "directions.json"
+    out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "directions.json")
     io.open(out, "w", encoding="utf-8").write(
         json.dumps(DIRECTIONS, ensure_ascii=False, indent=2))
-    io.open("tokens.css", "w", encoding="utf-8").write(tokens_css(chosen()))
+    io.open(os.path.join(HERE, "tokens.css"), "w", encoding="utf-8").write(tokens_css(chosen()))
 
     for d in DIRECTIONS:
         c = d["colors"]
