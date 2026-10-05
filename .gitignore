@@ -78,3 +78,6 @@ Thumbs.db
 _qa/
 _frames/
 _shot-*.png
+
+# static-site images pulled from SharePoint by <brand>/ops/deploy.py assets
+*/site/assets/

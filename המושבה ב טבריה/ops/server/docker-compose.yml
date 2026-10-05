@@ -1,0 +1,26 @@
+# ---------------------------------------------------------------------------
+# פריסת אתר המושבה ב׳ על ה-Mac mini (OrbStack) — ~/server/moshava-b
+#   moshava-b   nginx שמגיש את ./site (פורט מארח 8108, localhost בלבד)
+#   cloudflared מנהרה ייעודית, בלי sudo: moshava-b.newavera.co.il → moshava-b:80
+# ./site ו-./tunnel לא בגיט של השרת — deploy.py מעלה את site, tunnel נוצר פעם אחת.
+# ---------------------------------------------------------------------------
+services:
+  moshava-b:
+    image: nginx:1.27-alpine
+    container_name: moshava-b
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8108:80'
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: moshava-b-tunnel
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./tunnel:/etc/cloudflared:ro
+    depends_on:
+      - moshava-b
