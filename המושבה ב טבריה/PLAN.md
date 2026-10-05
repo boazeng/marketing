@@ -21,11 +21,11 @@ https://yaelisrael.sharepoint.com/Shared Documents/TACT/שיווק/מכירת ק
 
 | שלב | סטטוס |
 |---|---|
-| שם תצוגה `Urban Group Marketing` | ⏳ הוגש ב-API ב-2026-09-27 · `PENDING_REVIEW` (השם הקודם "bot ariel" נדחה). נתקע עד הרישום |
+| שם תצוגה `Urban Group Marketing` | ✅ אושר ופעיל 2026-10-05. ⚠️ שם שאושר **לא נכנס לתוקף לבד** — נדרש `POST /{phone-id}/register` חוזר עם ה-PIN; עד אז הלקוח רואה את השם הישן |
 | רישום ל-Cloud API | ✅ 2026-10-01 · `CONNECTED`, איכות GREEN · PIN ב-`WHATSAPP_2FA_PIN_ARIEL` |
 | פרופיל (about, תיאור, מייל) | ✅ 2026-10-01 — Urban Group Marketing, `tactnmark@gmail.com` |
-| webhook + בוט ניתוב לפי קמפיין | ⬜ WABA `1410564280615182` (עסק Urban Whatsup, מאומת) · אפליקציה `ariel` (915959480947721) מנויה. בוט אריאל של `urbangroup` **לא נדרש עוד** (בועז, 2026-10-01) — הבוט החדש מחליף אותו. אין App Secret ב-`.env` |
-| חיבור באתר | ✅ `site/js/config.js` — ⚠️ האתר כבר באוויר; הכפתור לא יגיע לאף אחד עד שהרישום וה-webhook עובדים. לא לפרסם את הקישור לפני כן |
+| webhook + בוט ניתוב לפי קמפיין | ✅ 2026-10-05 — `ops/wa-leads/` (Lambda `tact-wa-leads`). ליד → task-manager (ערוץ whatsapp) + טלגרם + תשובה ללקוח. ה-webhook של ה-WABA הועבר; בוט אריאל של `urbangroup` כבר לא מקבל הודעות. ⬜ בדיקה מקצה לקצה עם הודעה אמיתית |
+| חיבור באתר | ✅ כפתורי הוואטסאפ בדף הנחיתה מגיעים לבוט |
 
 ## אתר — https://moshava-b.newavera.co.il
 **דף נחיתה** (מ-2026-10-05) — מחליף את האתר המלא. Mac mini · nginx סטטי · פורט 8108 ·
@@ -76,7 +76,7 @@ TACT NIRIM · Business ID `1377755173854876`.
 |---|---|
 | פיקסל `moshava-b` `28613934514923512` | ✅ מותקן באתר (`config.js` → `metaPixelId`). אירועים: `PageView`, `Lead` (טופס נשלח), `Contact` (לחיצת וואטסאפ) |
 | בדיקת הפיקסל | ✅ PageView + Contact נצפו ברשת. ⚠️ fbevents **לא יורה בדפדפן אוטומטי** (`navigator.webdriver`) — בדיקת Playwright רגילה מחזירה אפס אירועים ונראית כמו תקלה. `Lead` לא נבדק כדי לא ליצור ליד מזויף |
-| קמפיין | ⬜ |
+| קמפיין `המושבה ב׳ \| תנועה לדף \| צפון` | ▶ **הופעל 2026-10-05** (בועז אישר) — `social/campaign.py`. עצירה: `python campaign.py pause`. צפיות בדף נחיתה · קטגוריית Housing · טבריה + 25 ק״מ (בלי ירדן וסוריה) · 18–65 · פייסבוק בלבד · 30 ₪/יום · 30 יום, עד 2026-11-04 · 2 מודעות (ad1 כנרת, ad3 פוריה) מהחומר המאושר ב-SharePoint. מצב ובדיקת מטא: `python campaign.py status` |
 
 ## סטטוס
 | שלב | סטטוס |
