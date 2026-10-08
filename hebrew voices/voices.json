@@ -1,0 +1,101 @@
+{
+  "_readme": "קולות Deepdub לעברית. המפתח לא כאן: DEEPDUB_API_KEY בקובץ ה-.env המשותף (C:\\Users\\User\\Aiprojects\\env\\.env). כל רשומה = הפרמטרים שנשלחים ל-DeepdubClient.tts() חוץ מ-text.",
+  "voices": [
+    {
+      "name": "voice-01",
+      "description": "גבר, דיבור ספונטני ניטרלי",
+      "voice_prompt_id": "ce16d36b-31b2-4018-9b7a-f62adcfa3c7a_spontaneous-speech-neutral",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "male",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "היי, מה קורה? היום אנחנו נדבר על חמישה דברים שאתם חייבים לדעת לפני שמתחילים פודקאסט חדש."
+    },
+    {
+      "name": "MOSHE",
+      "description": "גבר, דיבור ספונטני ניטרלי",
+      "voice_prompt_id": "cd91dbf2-7265-420b-b8fd-9b90f2555d02_prompt-spontaneous-speech-neutral",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "male",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "היי, מה קורה? היום אנחנו נדבר על חמישה דברים שאתם חייבים לדעת לפני שמתחילים פודקאסט חדש."
+    },
+    {
+      "name": "CARMEN",
+      "description": "אישה",
+      "voice_prompt_id": "2a343a72-49e7-4279-a6fd-3ae8965c811b",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "female",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "תגלית ארכיאולוגית חדשה במדבר יהודה חושפת ממצאים שעשויים לשנות את הבנתנו על תקופת בית שני."
+    },
+    {
+      "name": "Miguel Peña HE",
+      "description": "גבר, בן 40",
+      "voice_prompt_id": "516e132e-af96-48f1-a2b0-c0c7925699d2",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "male",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "תגלית ארכיאולוגית חדשה במדבר יהודה חושפת ממצאים שעשויים לשנות את הבנתנו על תקופת בית שני."
+    },
+    {
+      "name": "DALIYA",
+      "description": "קריאה ניטרלית. שים לב: הקוד מ-Deepdub הגיע עם target_gender=male — לבדוק אם זה נכון",
+      "voice_prompt_id": "7f253a7f-cca9-4aff-ab17-987b7a8f01fc_prompt-reading-neutral",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "male",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "השמש שקעה מאחורי ההרים, והשמיים נצבעו בגוונים של כתום וסגול. רוח קלה נשבה בין העצים, וריח הפרחים מילא את האוויר."
+    },
+    {
+      "name": "MOSHE 2",
+      "description": "גבר, דיבור ספונטני ניטרלי",
+      "voice_prompt_id": "393b6759-b273-4742-bf1c-094772a03527_prompt-spontaneous-speech-neutral",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "male",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "היי, מה קורה? היום אנחנו הולכים לדבר על הטרנדים החמים ברשתות החברתיות ואיך הם משפיעים על כולנו."
+    },
+    {
+      "name": "DAN",
+      "description": "גבר",
+      "voice_prompt_id": "199c569d-aa03-4e70-9a3e-f8ce3269b9df",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "male",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "לפעמים הדברים הכי טובים בחיים מגיעים בדיוק כשמפסיקים לחפש אותם."
+    },
+    {
+      "name": "Guillermo Castro HE",
+      "description": "גבר",
+      "voice_prompt_id": "d590c9c0-787a-4c99-a2e0-312c6a9c850c",
+      "model": "dd-etts-3.4",
+      "locale": "he-IL",
+      "target_gender": "male",
+      "accent_base_locale": "he-IL",
+      "accent_locale": "he-IL",
+      "accent_ratio": 0.75,
+      "sample_text": "לפעמים הדברים הכי טובים בחיים מגיעים בדיוק כשמפסיקים לחפש אותם."
+    }
+  ]
+}

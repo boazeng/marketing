@@ -1,0 +1,26 @@
+# ---------------------------------------------------------------------------
+# דף הנחיתה של ייפוי כוח מתמשך על ה-Mac mini (OrbStack) — ~/server/zohar
+#   zohar        nginx שמגיש את ./site (פורט מארח 8109, localhost בלבד)
+#   cloudflared  מנהרה ייעודית, בלי sudo: zohar.newavera.co.il → zohar:80
+# ./site ו-./tunnel לא בגיט של השרת — deploy.py מעלה את site, tunnel נוצר פעם אחת.
+# ---------------------------------------------------------------------------
+services:
+  zohar:
+    image: nginx:1.27-alpine
+    container_name: zohar
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8109:80'
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: zohar-tunnel
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./tunnel:/etc/cloudflared:ro
+    depends_on:
+      - zohar

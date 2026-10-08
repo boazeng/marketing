@@ -1,0 +1,73 @@
+<!-- Injected by ops/deploy.py before the page's contact section. Not part of
+     the page in SharePoint. It borrows the page's own classes (container,
+     section-head, panel, btn) so it follows a restyle without being touched.
+
+     Posts to the lead proxy shared by every TACT site (bedek/ops/leads.md):
+     task-manager + Telegram. Name and phone only -- see PROJECTS["zohar"] in
+     the proxy for why there is no message field. -->
+<style>
+  .zl{max-width:34rem}
+  .zl label{display:block;font-weight:600;color:var(--navy,#0f2744);margin:0 0 .35rem}
+  .zl input{width:100%;font:inherit;padding:.8rem 1rem;border-radius:12px;margin-bottom:1rem;
+    border:1px solid rgba(15,39,68,.25);background:#fff;color:inherit}
+  .zl input:focus-visible{outline:3px solid var(--gold,#c4a35a);outline-offset:2px}
+  /* Honeypot. Hidden by clipping, NOT by an offset: in an RTL page `left:-9999px`
+     is scrollable overflow, and the whole page gains ten screens of blank width. */
+  .zl .hp{position:absolute;width:1px;height:1px;padding:0;border:0;margin:0;
+    overflow:hidden;clip-path:inset(50%);opacity:0;pointer-events:none}
+  .zl small{display:block;margin-top:.9rem;color:var(--muted,#5a6b7d)}
+  .zl [role=status]{margin-top:1rem;font-weight:600;color:var(--navy,#0f2744)}
+  .zl [role=status].bad{color:#a12a1a}
+</style>
+<section id="lead">
+  <div class="container">
+    <div class="section-head">
+      <h2>השאירו פרטים ונחזור אליכם</h2>
+    </div>
+    <form class="panel zl" id="zl" novalidate>
+      <label for="zl-name">שם מלא</label>
+      <input id="zl-name" name="name" autocomplete="name" required>
+      <label for="zl-phone">טלפון</label>
+      <input id="zl-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" required>
+      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn btn-primary" type="submit">שליחה</button>
+      <small>הפרטים ישמשו ליצירת קשר בלבד.</small>
+      <div role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+<script>
+(function () {
+  var form = document.getElementById("zl"), out = form.querySelector("[role=status]"),
+      btn = form.querySelector("button"), started = Date.now(), campaign = {};
+  try {
+    new URLSearchParams(location.search).forEach(function (v, k) {
+      if (/^utm_|^fbclid$|^gclid$/.test(k)) campaign[k] = v.slice(0, 200);
+    });
+  } catch (e) { /* old browser: the lead still goes, untagged */ }
+
+  function say(text, bad) { out.textContent = text; out.className = bad ? "bad" : ""; }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = form.name.value.trim(), phone = form.phone.value.trim(),
+        digits = phone.replace(/\D/g, "");
+    if (!name) return say("נא למלא שם.", true);
+    if (digits.length < 9 || digits.length > 12) return say("מספר הטלפון אינו תקין.", true);
+    btn.disabled = true; say("שולח…");
+    fetch("https://yazam-il.com/api/lead", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ project: "zohar", source: "landing", name: name, phone: phone,
+        website: form.website.value, startedAt: started, page: location.href,
+        referrer: document.referrer, campaign: campaign })
+    }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      form.reset(); say("תודה, הפרטים התקבלו. נחזור אליכם בהקדם.");
+      if (window.fbq) fbq("track", "Lead");
+    }).catch(function () {
+      // Never leave a person who wanted to be called with nothing to do.
+      btn.disabled = false; say("השליחה נכשלה. אפשר להתקשר: 050-8894215", true);
+    });
+  });
+})();
+</script>

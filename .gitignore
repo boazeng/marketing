@@ -81,3 +81,7 @@ _shot-*.png
 
 # static-site images pulled from SharePoint by <brand>/ops/deploy.py assets
 */site/assets/
+
+# the landing page itself is edited and approved in SharePoint; deploy.py pull
+# fetches it. A committed copy would be the one that missed the last correction.
+יפוי כח מתמשך/site/
