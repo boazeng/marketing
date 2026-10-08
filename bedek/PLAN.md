@@ -1,7 +1,7 @@
 # תוכנית שיווק — מודול בדק (TACT)
 
 > תיקיית עבודה: `C:\Users\User\Aiprojects\marketing\bedek`
-> נוצר: 2026-08-25 · סטטוס כללי: **שלב 3 — רשתות חברתיות.** האתר, דף הנחיתה, טופס הלידים וה-OnePage חיים על AWS. נותר: שתי רשומות CNAME, מפתח CRM, ופרטי קשר.
+> נוצר: 2026-08-25 · סטטוס כללי: **שלב 3 — רשתות חברתיות.** האתר, דף הנחיתה, טופס הלידים וה-OnePage חיים על AWS. הלידים נרשמים ב-task-manager מאז 2026-10-04 ([ops/leads.md](ops/leads.md)), כך שמפתח ה-CRM כבר לא חוסם דבר. נותר: שתי רשומות CNAME ופרטי קשר.
 
 מסמך זה הוא תוכנית העבודה. ההחלטות הפתוחות מרוכזות ב-[DECISIONS.md](DECISIONS.md).
 המבנה כאן מיועד להיות **תבנית** — ראה [ops/playbook.md](ops/playbook.md).
@@ -69,8 +69,9 @@
 
 ### שלב 5 — תוכן שוטף (שלב ב')
 פוסטים, תמונות, סרטון תדמית. **לא מתחילים לפני שהאתר חי** — אין לאן להפנות.
-תשתית קיימת ומוכחת: `tact - bedek/video-20s` (Chromium+ffmpeg), ElevenLabs
-לקריינות עברית, fal.ai לוידאו, נועה כאווטאר.
+תשתית קיימת ומוכחת: `tact - bedek/video-20s` (Chromium+ffmpeg), Deepdub
+לקריינות עברית (ElevenLabs נשמר להשוואה — [video/README.md](video/README.md)),
+fal.ai לוידאו, נועה כאווטאר.
 
 ---
 
@@ -81,7 +82,7 @@
 | צורך | כלי | מפתח קיים? |
 |---|---|---|
 | וידאו AI | fal.ai | ✅ `FALAI_API_KEY` |
-| קריינות עברית | ElevenLabs (`eleven_v3` בלבד) | ✅ `ELEVENLABS_API_KEY` |
+| קריינות עברית | Deepdub (`dd-etts-3.4`) · ElevenLabs (`eleven_v3` בלבד) להשוואה | ✅ `DEEPDUB_API_KEY` · `ELEVENLABS_API_KEY` |
 | תמונות עם טקסט עברי | Nano Banana / Gemini | ✅ `GOOGLE_API_KEY` |
 | עריכה גרפית | Canva | ✅ `CANVA_CLIENT_ID/SECRET` |
 | פרסום לפייסבוק/אינסטגרם | Meta Graph API | ⚠️ קיים `META_APP_ID/SECRET` מבוט האנרגיה — נוסיף Page+IG חדשים תחתיו |

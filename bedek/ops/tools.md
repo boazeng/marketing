@@ -4,7 +4,8 @@
 | צורך | כלי | מפתח |
 |---|---|---|
 | וידאו AI | fal.ai | `FALAI_API_KEY` |
-| קריינות עברית | ElevenLabs | `ELEVENLABS_API_KEY` — **רק `eleven_v3` מדבר עברית** |
+| קריינות עברית | Deepdub (`dd-etts-3.4`) — המנוע הנוכחי | `DEEPDUB_API_KEY` |
+| קריינות עברית, להשוואה | ElevenLabs | `ELEVENLABS_API_KEY` — **רק `eleven_v3` מדבר עברית** |
 | תמונות עם טקסט עברי | Gemini / Nano Banana | `GOOGLE_API_KEY` |
 | עריכה גרפית | Canva | `CANVA_CLIENT_ID` + `CANVA_CLIENT_SECRET` |
 | פייסבוק/אינסטגרם | Meta Graph API | `META_APP_ID` + `META_APP_SECRET` (מבוט האנרגיה) |
@@ -20,7 +21,7 @@
 | **Meta Pixel** | חובה בשביל רימרקטינג בפייסבוק — **בכל מקרה מתקינים** | דורש הסכמה |
 
 ### דיוור / ניוזלטר
-לא נדרש בשלב א׳. הלידים הולכים ל-TACT-Leads. אם בהמשך — Brevo (חינם עד 300/יום).
+לא נדרש בשלב א׳. הלידים נרשמים ב-task-manager ([leads.md](leads.md)). אם בהמשך — Brevo (חינם עד 300/יום).
 
 ## מה **לא** נשתמש בו ולמה
 - **מחוללי תמונות ללוגו** — לוגו חייב וקטור. SVG בקוד.

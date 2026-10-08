@@ -2,9 +2,9 @@
 """
 Deploys the lead proxy: IAM role, Lambda, SSM parameters.
 
-    python deploy.py secrets     store/refresh the three secrets in SSM
+    python deploy.py secrets     store/refresh the secrets in SSM
     python deploy.py deploy      create or update the function
-    python deploy.py test        send a synthetic lead through the live CDN
+    python deploy.py test        send a synthetic lead per project through the live CDN
 
 Plain boto3-free CLI calls so this needs nothing installed beyond the aws CLI
 that is already on this machine. The function itself is stdlib + boto3 (which
@@ -23,6 +23,16 @@ ROLE = "yazam-il-lead-proxy-role"
 P_CRM = "yazam-il-crm-api-key"
 P_TG_TOKEN = "yazam-il-telegram-token"
 P_TG_CHAT = "yazam-il-telegram-chat"
+P_EDGE = "yazam-il-edge-secret"          # written by attach-to-cdn.py
+# The system of record's lead-intake token. Written to SSM by that system's
+# side, never by this script: the token is minted there and must not pass
+# through a chat, a shell history or the shared .env on its way here.
+P_TASK = "yazam-il-task-manager-token"
+# task-manager: company "tact" -> workspace "לידים משיווק" -> domain "לידים".
+# Empty turns the destination off; every lead then reaches Telegram marked
+# "not saved" and is logged whole in CloudWatch -- see ../leads.md.
+TASK_URL = "https://task-manager.newavera.co.il/api/lead-intake"
+TASK_TOKEN_HEADER = "X-Lead-Token"
 # The shared secrets file. Override with TACT_ENV on a machine where it
 # lives elsewhere -- nothing in this repo may ever contain a secret.
 SHARED_ENV = os.environ.get("TACT_ENV", r"C:\Users\User\Aiprojects\env\.env")
@@ -84,18 +94,11 @@ TRUST = json.dumps({
 })
 
 
-def ensure_role():
-    existing = aws("iam", "get-role", "--role-name", ROLE,
-                   "--query", "Role.Arn", "--output", "text", parse=False, check=False)
-    if existing:
-        return existing
-
-    arn = aws("iam", "create-role", "--role-name", ROLE,
-              "--assume-role-policy-document", TRUST,
-              "--query", "Role.Arn", "--output", "text", parse=False)
-    aws("iam", "attach-role-policy", "--role-name", ROLE, "--policy-arn",
-        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", parse=False)
-    # Read exactly these three parameters and nothing else.
+def put_policy():
+    # Read exactly these parameters and nothing else. Re-applied on every
+    # deploy, not only when the role is created: a parameter added later (the
+    # TACT Task token was) is otherwise a silent AccessDenied inside the
+    # function, which the lead path swallows by design.
     aws("iam", "put-role-policy", "--role-name", ROLE, "--policy-name", "read-own-secrets",
         "--policy-document", json.dumps({
             "Version": "2012-10-17",
@@ -103,10 +106,24 @@ def ensure_role():
                 "Effect": "Allow",
                 "Action": ["ssm:GetParameter"],
                 "Resource": [f"arn:aws:ssm:{REGION}:{ACCOUNT}:parameter/{p}"
-                             for p in (P_CRM, P_TG_TOKEN, P_TG_CHAT,
-                                       "yazam-il-edge-secret")],
+                             for p in (P_CRM, P_TG_TOKEN, P_TG_CHAT, P_EDGE, P_TASK)],
             }],
         }), parse=False)
+
+
+def ensure_role():
+    existing = aws("iam", "get-role", "--role-name", ROLE,
+                   "--query", "Role.Arn", "--output", "text", parse=False, check=False)
+    if existing:
+        put_policy()
+        return existing
+
+    arn = aws("iam", "create-role", "--role-name", ROLE,
+              "--assume-role-policy-document", TRUST,
+              "--query", "Role.Arn", "--output", "text", parse=False)
+    aws("iam", "attach-role-policy", "--role-name", ROLE, "--policy-arn",
+        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole", parse=False)
+    put_policy()
     print(f"   role {ROLE} created; waiting for IAM to propagate")
     time.sleep(12)          # a fresh role is not immediately assumable
     return arn
@@ -121,11 +138,19 @@ def package():
     return path
 
 
+# The WHOLE environment, because update-function-configuration replaces it.
+# EDGE_SECRET_PARAM used to be set only by attach-to-cdn.py, so a plain
+# `deploy` dropped it -- and with it the check that a request came through
+# CloudFront at all.
 ENV = {"Variables": {
     "CRM_URL": "https://crm-db.newavera.co.il/api/v1/customers",
     "CRM_KEY_PARAM": P_CRM,
     "TG_TOKEN_PARAM": P_TG_TOKEN,
     "TG_CHAT_PARAM": P_TG_CHAT,
+    "EDGE_SECRET_PARAM": P_EDGE,
+    "TASK_URL": TASK_URL,
+    "TASK_TOKEN_PARAM": P_TASK,
+    "TASK_TOKEN_HEADER": TASK_TOKEN_HEADER,
 }}
 
 
@@ -162,26 +187,51 @@ def deploy():
 
 # --------------------------------------------------------------------- test
 
+# One synthetic lead per project, shaped like that site's own form. Marked so
+# the marketer can tell them from real ones and close them.
+TESTS = {
+    "bedek": ("https://yazam-il.com", {
+        "name": "[בדיקה] בדיקה אוטומטית", "company": "טאקט בדיקות בע\"מ",
+        "phone": "050-0000000", "email": "test-lead@yazam-il.com",
+        "projects": "3", "note": "ליד סינתטי מ-deploy.py test — אפשר לסגור",
+        "source": "site", "campaign": {"utm_source": "selftest"}}),
+    "moshava-b": ("https://moshava-b.newavera.co.il", {
+        "name": "[בדיקה] בדיקה אוטומטית", "phone": "050-0000001",
+        "interest": "משקיע", "note": "ליד סינתטי מ-deploy.py test — אפשר לסגור",
+        "project": "moshava-b", "source": "site",
+        "page": "https://moshava-b.newavera.co.il/?utm_source=selftest",
+        "campaign": {"utm_source": "selftest"}}),
+    "zohar": ("https://zohar.newavera.co.il", {
+        "name": "[בדיקה] בדיקה אוטומטית", "phone": "050-0000002",
+        "project": "zohar", "source": "landing",
+        "page": "https://zohar.newavera.co.il/?utm_source=selftest",
+        "campaign": {"utm_source": "selftest"}}),
+}
+
+
 def test():
     # Through the CDN, which is the only path that carries the origin token.
-    url = "https://d288tvmi7qlbjd.cloudfront.net/api/lead"
-    payload = {
-        "name": "בדיקה אוטומטית", "company": "טאקט בדיקות בע\"מ",
-        "phone": "050-0000000", "email": "test-lead@yazam-il.com",
-        "projects": "3", "note": "ליד סינתטי מ-deploy.py test",
-        "source": "site", "campaign": {"utm_source": "selftest"},
-        "startedAt": (time.time() - 60) * 1000,
-    }
     import urllib.request
-    req = urllib.request.Request(
-        url, data=json.dumps(payload, ensure_ascii=False).encode(),
-        headers={"Content-Type": "application/json", "origin": "https://yazam-il.com"})
-    try:
-        with urllib.request.urlopen(req, timeout=25) as r:
-            print(r.status, r.read().decode())
-    except Exception as e:                       # noqa: BLE001
-        body = getattr(e, "read", lambda: b"")().decode("utf-8", "replace")
-        print(f"FAILED {type(e).__name__}: {e}\n{body}")
+    url = "https://d288tvmi7qlbjd.cloudfront.net/api/lead"
+    wanted = sys.argv[2:] or list(TESTS)
+    failed = False
+    for slug in wanted:
+        origin, payload = TESTS[slug]
+        payload = dict(payload, startedAt=(time.time() - 60) * 1000)
+        req = urllib.request.Request(
+            url, data=json.dumps(payload, ensure_ascii=False).encode(),
+            headers={"Content-Type": "application/json", "origin": origin})
+        try:
+            with urllib.request.urlopen(req, timeout=25) as r:
+                print(slug, r.status, r.read().decode(),
+                      "| allow-origin:", r.headers.get("Access-Control-Allow-Origin"))
+        except Exception as e:                   # noqa: BLE001
+            body = getattr(e, "read", lambda: b"")().decode("utf-8", "replace")
+            print(f"{slug} FAILED {type(e).__name__}: {e}\n{body}")
+            failed = True
+    # A 200 here only says the visitor was answered. Whether the lead reached
+    # TACT Task is in the Telegram message (green/red) and in the table itself.
+    if failed:
         sys.exit(1)
 
 

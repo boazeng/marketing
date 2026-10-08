@@ -107,14 +107,12 @@ def main():
     aws("lambda", "remove-permission", "--region", REGION, "--function-name", FN,
         "--statement-id", "AllowCloudFront", parse=False, check=False)
 
+    # deploy.py owns the function's environment -- the call replaces all of
+    # it, so two scripts each writing their own subset silently drop the
+    # other's variables.
+    from deploy import ENV
     aws("lambda", "update-function-configuration", "--region", REGION,
-        "--function-name", FN, "--environment", json.dumps({"Variables": {
-            "CRM_URL": "https://crm-db.newavera.co.il/api/v1/customers",
-            "CRM_KEY_PARAM": "yazam-il-crm-api-key",
-            "TG_TOKEN_PARAM": "yazam-il-telegram-token",
-            "TG_CHAT_PARAM": "yazam-il-telegram-chat",
-            "EDGE_SECRET_PARAM": P_EDGE,
-        }}), parse=False)
+        "--function-name", FN, "--environment", json.dumps(ENV), parse=False)
     aws("lambda", "wait", "function-updated", "--region", REGION,
         "--function-name", FN, parse=False)
 
