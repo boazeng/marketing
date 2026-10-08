@@ -10,9 +10,10 @@ Rendered as PNG sequences rather than CSS animation: @keyframes are not
 deterministic under frame-by-frame capture, so the clock is advanced by hand
 and each frame is drawn from a pure function of t. Same input, same film.
 
-    python make_cards.py
+    python make_cards.py                       both, against the Deepdub take
+    python make_cards.py --engine elevenlabs   against the first take
 """
-import io, json, math, os, subprocess, sys
+import io, json, math, os, shutil, subprocess, sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -20,7 +21,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
 OUT = os.path.join(HERE, "cards")
 sys.path.insert(0, HERE)
-from scripts import VIDEOS  # noqa: E402
+from scripts import VIDEOS, TAIL, TAIL_BY_BEAT  # noqa: E402
+from vo import parse, audio_dir, cards_dir  # noqa: E402
 
 C = next(d for d in json.load(io.open(
     os.path.join(ROOT, "brand", "palette", "directions.json"), encoding="utf-8"))
@@ -100,10 +102,15 @@ CARDS = {
 }
 
 
-def render(slug, bid, kind, text, sub, seconds):
+def render(slug, bid, kind, text, sub, seconds, engine, mp4_dir):
     from playwright.sync_api import sync_playwright
     frames = int(round(seconds * FPS))
-    d = os.path.join(OUT, f"{slug}-{bid}")
+    # Frames live per engine, and the directory is emptied first. Two takes of
+    # the same line are not the same length: leave the longer take's frames
+    # behind and ffmpeg's %04d glob picks them up, producing a card that
+    # outlasts the line it is under -- silently, because nothing errors.
+    d = os.path.join(OUT, engine, f"{slug}-{bid}")
+    shutil.rmtree(d, ignore_errors=True)
     os.makedirs(d, exist_ok=True)
     html = page(kind, text.replace("\n", "<br>"), sub)
     with sync_playwright() as p:
@@ -115,7 +122,8 @@ def render(slug, bid, kind, text, sub, seconds):
             pg.evaluate("([t,d]) => window.SEEK(t,d)", [i / FPS, seconds])
             pg.screenshot(path=os.path.join(d, f"{i:04d}.png"))
         b.close()
-    mp4 = os.path.join(HERE, "clips", f"{slug}-{bid}.mp4")
+    os.makedirs(mp4_dir, exist_ok=True)
+    mp4 = os.path.join(mp4_dir, f"{slug}-{bid}.mp4")
     subprocess.run(["ffmpeg", "-y", "-v", "error", "-framerate", str(FPS),
                     "-i", os.path.join(d, "%04d.png"),
                     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "16", mp4],
@@ -124,10 +132,19 @@ def render(slug, bid, kind, text, sub, seconds):
 
 
 if __name__ == "__main__":
-    timing = json.load(io.open(os.path.join(HERE, "audio", "timing.json"), encoding="utf-8"))
-    os.makedirs(OUT, exist_ok=True)
+    only, engine, take = parse(sys.argv[1:])
+    mp4_dir = cards_dir(engine, take)
+    engine = f"{engine}-{take}" if take else engine
+    timing = json.load(io.open(os.path.join(audio_dir(engine), "timing.json"),
+                               encoding="utf-8"))
     for v in VIDEOS:
+        if only and v["slug"] != only:
+            continue
         secs = {b["id"]: b["sec"] for b in timing[v["slug"]]["beats"]}
         for bid, (kind, text, sub) in CARDS[v["slug"]].items():
-            # +0.5s so the card holds a beat after the line lands
-            render(v["slug"], bid, kind, text, sub, secs[bid] + 0.5)
+            # The same hold build.py cuts the shot to. It was a fixed 0.5s
+            # while TAIL was 0.45; once TAIL grew past it the card ran out
+            # before its shot did -- and build.py computes its dissolve offsets
+            # assuming every segment really is `line + tail` long.
+            render(v["slug"], bid, kind, text, sub,
+                   secs[bid] + TAIL_BY_BEAT.get(bid, TAIL), engine, mp4_dir)

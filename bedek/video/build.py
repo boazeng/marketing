@@ -23,17 +23,19 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from scripts import VIDEOS  # noqa: E402
+from scripts import VIDEOS, TAIL, TAIL_BY_BEAT  # noqa: E402
+from vo import parse, audio_dir, music_path, cards_dir, out_dir  # noqa: E402
 
-CLIPS, AUDIO, OUT = (os.path.join(HERE, d) for d in ("clips", "audio", "out"))
+CLIPS = os.path.join(HERE, "clips")   # the paid fal footage
 W, H = 1280, 720
 # 30, not the 32 the source clips happen to be. A non-standard rate plus sparse
 # keyframes is what makes basic players stall a few seconds in -- they cannot
 # find a sync point. ffmpeg converts on the way through.
 FPS = 30
 GOP = FPS * 2          # a keyframe every 2s, so seeking and streaming behave
-TAIL = 0.45          # air after each line before the cut
 XF = 0.35            # cross-dissolve between beats
+# TAIL -- the air after each line -- comes from scripts.py, with the rest of
+# the rhythm decisions.
 
 
 def run(args):
@@ -43,7 +45,7 @@ def run(args):
     return r
 
 
-def build(v, timing):
+def build(v, timing, audio, cards, OUT):
     slug = v["slug"]
     secs = {b["id"]: b["sec"] for b in timing[slug]["beats"]}
     tmp = os.path.join(HERE, "_tmp", slug)
@@ -53,8 +55,10 @@ def build(v, timing):
     # ---- 1. one picture segment per beat, trimmed to its narration ---------
     segs, vo_parts, t = [], [], 0.0
     for b in v["beats"]:
-        dur = secs[b["id"]] + TAIL
-        src = os.path.join(CLIPS, f"{slug}-{b['id']}.mp4")
+        dur = secs[b["id"]] + TAIL_BY_BEAT.get(b["id"], TAIL)
+        # card beats are rendered, the rest are generated footage
+        src = os.path.join(cards if b.get("card") else CLIPS,
+                           f"{slug}-{b['id']}.mp4")
         seg = os.path.join(tmp, f"{b['id']}.mp4")
         # The generated clips are 5.03s. Longer beats are slowed to fit rather
         # than looped -- a visible loop point reads as a mistake, a slightly
@@ -71,7 +75,7 @@ def build(v, timing):
         # XF shorter per transition. The narration has to sit on that same
         # shortened timeline -- placing it on the naive sum leaves the last line
         # hanging past the end of picture, where `-shortest` silently cuts it.
-        vo_parts.append((os.path.join(AUDIO, f"{slug}-{b['id']}.mp3"),
+        vo_parts.append((os.path.join(audio, f"{slug}-{b['id']}.mp3"),
                          t - len(segs[:-1]) * XF))
         t += dur
 
@@ -107,7 +111,7 @@ def build(v, timing):
          "-map", "[a]", "-t", f"{total:.3f}", vo])
 
     # ---- 4. music, ducked under the voice --------------------------------
-    music = os.path.join(AUDIO, "bed.wav")
+    music = music_path()
     final_a = os.path.join(tmp, "mix.wav")
     if os.path.exists(music):
         run(["ffmpeg", "-y", "-v", "error", "-i", vo, "-stream_loop", "-1", "-i", music,
@@ -145,10 +149,18 @@ def build(v, timing):
 
 
 if __name__ == "__main__":
-    only = sys.argv[1] if len(sys.argv) > 1 else None
-    timing = json.load(io.open(os.path.join(AUDIO, "timing.json"), encoding="utf-8"))
+    # The card clips in `clips/` are cut to the narration they sit under, so
+    # they belong to whichever engine last ran make_cards.py. Switching engines
+    # here without re-running it leaves the two cards out of sync with the
+    # voice. Re-rendering them is free; the fal clips beside them are not, and
+    # make_cards.py never touches those.
+    only, engine, take = parse(sys.argv[1:])
+    audio = audio_dir(engine, take)
+    cards = cards_dir(engine, take)
+    OUT = out_dir(take)
+    timing = json.load(io.open(os.path.join(audio, "timing.json"), encoding="utf-8"))
     for v in VIDEOS:
         if only and v["slug"] != only:
             continue
-        build(v, timing)
-    print(f"\n-> {OUT}")
+        build(v, timing, audio, cards, OUT)
+    print(f"\n-> {OUT}   ({engine}{'-' + take if take else ''})")
